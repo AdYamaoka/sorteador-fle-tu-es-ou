@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sorteador – Je t’attends où ?</title>
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --card: #ffffff;
+      --text: #2f2f2f;
+      --accent: #b08968;
+      --accent-2: #7a8c7b;
+      --border: #e3ddd7;
+      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      background: linear-gradient(180deg, #f7f6f3 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 1.05rem;
+      color: #5d5d5d;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 24px 0 36px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-size: 0.98rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      box-shadow: var(--shadow);
+      font-family: inherit;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(1px); }
+
+    .btn-main {
+      background: var(--text);
+      color: white;
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-soft {
+      background: var(--accent-2);
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.35rem;
+    }
+
+    .label {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.84rem;
+      background: #f2ece7;
+      color: #6a4d3a;
+    }
+
+    .result {
+      font-size: 1.5rem;
+      line-height: 1.35;
+      min-height: 92px;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+    }
+
+    .subtext {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #d8d2cb;
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      min-height: 72px;
+    }
+
+    .mini-btn {
+      width: 100%;
+      margin-top: 18px;
+      background: #efe9e3;
+      color: var(--text);
+      box-shadow: none;
+      border: 1px solid #ddd4cc;
+    }
+
+    .combo {
+      margin-top: 34px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .combo h3 {
+      margin: 0 0 14px;
+      font-size: 1.3rem;
+    }
+
+    .combo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .combo-item {
+      background: #faf8f6;
+      border: 1px solid #e6dfd8;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .combo-item strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      color: #6a4d3a;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .combo-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Je t’attends où ?</h1>
+      <p>Sorteador de <em>lieu</em>, <em>situation</em> et <em>contraintes</em> pour créer des dialogues en FLE.</p>
+    </header>
+
+    <section class="controls">
+      <button class="btn-main" onclick="sortAll()">Tout tirer au sort</button>
+      <button class="btn-accent" onclick="copyScenario()">Copier le scénario</button>
+      <button class="btn-soft" onclick="resetScenario()">Réinitialiser</button>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div>
+          <span class="label">Lieu</span>
+          <h2>Où ?</h2>
+          <div id="placeResult" class="result">Cliquez pour tirer un lieu.</div>
+          <div class="subtext">Utilisez ce lieu comme point de départ du dialogue.</div>
+        </div>
+        <button class="mini-btn" onclick="drawPlace()">Tirer un lieu</button>
+      </article>
+
+      <article class="card">
+        <div>
+          <span class="label">Situation</span>
+          <h2>Pourquoi ?</h2>
+          <div id="situationResult" class="result">Cliquez pour tirer une situation.</div>
+          <div class="subtext">Le contexte doit guider le ton et les intentions du dialogue.</div>
+        </div>
+        <button class="mini-btn" onclick="drawSituation()">Tirer une situation</button>
+      </article>
+
+      <article class="card">
+        <div>
+          <span class="label">Contraintes</span>
+          <h2>Avec quels défis ?</h2>
+          <div id="constraintResult" class="result">Cliquez pour tirer deux contraintes.</div>
+          <div class="subtext">Les contraintes rendent l’échange plus réaliste et plus complexe.</div>
+        </div>
+        <button class="mini-btn" onclick="drawConstraints()">Tirer des contraintes</button>
+      </article>
+    </section>
+
+    <section class="combo">
+      <h3>Scénario complet</h3>
+      <div class="combo-grid">
+        <div class="combo-item">
+          <strong>Lieu</strong>
+          <div id="comboPlace">—</div>
+        </div>
+        <div class="combo-item">
+          <strong>Situation</strong>
+          <div id="comboSituation">—</div>
+        </div>
+        <div class="combo-item" style="grid-column: 1 / -1;">
+          <strong>Contraintes</strong>
+          <div id="comboConstraints">—</div>
+        </div>
+      </div>
+      <p class="footer-note">
+        Consigne possible : créez un dialogue en binôme avec ce lieu, cette situation et ces deux contraintes. Ajoutez une heure, une précision du lieu et une réaction.
+      </p>
+    </section>
+  </div>
+
+  <script>
+    const places = [
+      "un café à Saint-Germain",
+      "le cinéma UGC",
+      "la station Châtelet",
+      "le Louvre",
+      "le Jardin du Luxembourg",
+      "un restaurant italien",
+      "un centre commercial",
+      "la Tour Eiffel",
+      "la Gare du Nord",
+      "une salle de concert",
+      "un marché de rue",
+      "un café près d’un bureau",
+      "Montmartre",
+      "le centre de Paris",
+      "un premier lieu puis un nouveau lieu",
+      "un bar ou un parc"
+    ];
+
+    const situations = [
+      "un café entre amis",
+      "une sortie au cinéma",
+      "un point de rencontre dans le métro",
+      "une visite touristique au musée",
+      "un rendez-vous tranquille dans un parc",
+      "un dîner au restaurant",
+      "une séance de shopping",
+      "des touristes qui veulent se retrouver",
+      "une arrivée en train",
+      "un concert ou un événement",
+      "des courses au marché",
+      "un rendez-vous professionnel",
+      "un premier rendez-vous amoureux",
+      "un touriste perdu qui demande de l’aide",
+      "un changement de plan à la dernière minute",
+      "une rencontre avec un groupe d’amis"
+    ];
+
+    const constraints = [
+      "choisir entre l’intérieur et la terrasse",
+      "préciser le point exact du rendez-vous",
+      "négocier l’heure",
+      "une personne est en retard",
+      "préciser la sortie du métro",
+      "une personne est perdue",
+      "il y a trop de monde",
+      "vous devez changer de lieu",
+      "choisir un endroit précis dans le parc",
+      "une personne ne trouve pas l’endroit",
+      "vous avez des préférences différentes",
+      "vous devez choisir entre deux restaurants",
+      "vous devez changer de magasin",
+      "le téléphone n’a plus de batterie",
+      "vous devez préciser l’entrée du lieu",
+      "il y a un problème de localisation",
+      "le train est en retard",
+      "vous devez changer le point de rencontre",
+      "il y a beaucoup de monde dans la foule",
+      "c’est difficile de se retrouver",
+      "il y a du bruit et de la confusion",
+      "vous devez parler de façon formelle",
+      "il y a de l’hésitation",
+      "vous devez proposer plusieurs options",
+      "vous devez donner des directions",
+      "vous devez utiliser l’impératif",
+      "vous devez annuler le premier plan",
+      "vous devez proposer une alternative",
+      "il y a des opinions différentes dans le groupe",
+      "vous devez prendre une décision collective"
+    ];
+
+    let currentPlace = "—";
+    let currentSituation = "—";
+    let currentConstraints = [];
+
+    function randomItem(array) {
+      return array[Math.floor(Math.random() * array.length)];
+    }
+
+    function randomUniqueItems(array, count) {
+      const copy = [...array];
+      const result = [];
+      while (result.length < count && copy.length > 0) {
+        const index = Math.floor(Math.random() * copy.length);
+        result.push(copy.splice(index, 1)[0]);
+      }
+      return result;
+    }
+
+    function drawPlace() {
+      currentPlace = randomItem(places);
+      document.getElementById("placeResult").textContent = currentPlace;
+      document.getElementById("comboPlace").textContent = currentPlace;
+    }
+
+    function drawSituation() {
+      currentSituation = randomItem(situations);
+      document.getElementById("situationResult").textContent = currentSituation;
+      document.getElementById("comboSituation").textContent = currentSituation;
+    }
+
+    function drawConstraints() {
+      currentConstraints = randomUniqueItems(constraints, 2);
+      const text = currentConstraints.join(" + ");
+      document.getElementById("constraintResult").textContent = text;
+      document.getElementById("comboConstraints").textContent = text;
+    }
+
+    function sortAll() {
+      drawPlace();
+      drawSituation();
+      drawConstraints();
+    }
+
+    function resetScenario() {
+      currentPlace = "—";
+      currentSituation = "—";
+      currentConstraints = [];
+      document.getElementById("placeResult").textContent = "Cliquez pour tirer un lieu.";
+      document.getElementById("situationResult").textContent = "Cliquez pour tirer une situation.";
+      document.getElementById("constraintResult").textContent = "Cliquez pour tirer deux contraintes.";
+      document.getElementById("comboPlace").textContent = "—";
+      document.getElementById("comboSituation").textContent = "—";
+      document.getElementById("comboConstraints").textContent = "—";
+    }
+
+    async function copyScenario() {
+      const text = `Lieu : ${currentPlace}\nSituation : ${currentSituation}\nContraintes : ${currentConstraints.length ? currentConstraints.join(", ") : "—"}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Scénario copié.");
+      } catch (e) {
+        alert("Impossible de copier automatiquement.\n\n" + text);
+      }
+    }
+  </script>
+</body>
+</html>
